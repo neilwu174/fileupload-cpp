@@ -7,6 +7,11 @@
 #include <map>
 #include <string>
 #include <sys/socket.h>
+#include <sstream>
+#include <filesystem>
+#include <fstream>
+
+namespace fs = std::filesystem;
 
 struct HttpRequest {
     std::string method;
@@ -46,6 +51,51 @@ static bool sendAll(int fd, const std::string &data) {
         total += static_cast<size_t>(n);
     }
     return true;
+}
+
+static std::string readAll(int fd, size_t expected) {
+    std::string out;
+    out.reserve(expected);
+    while (out.size() < expected) {
+        char buf[8192];
+        size_t toRead = std::min(expected - out.size(), sizeof(buf));
+        ssize_t n = ::recv(fd, buf, toRead, 0);
+        if (n < 0) {
+            if (errno == EINTR) continue;
+            break;
+        } else if (n == 0) {
+            break; // peer closed
+        }
+        out.append(buf, buf + n);
+    }
+    return out;
+}
+
+static std::string generateFileName(const std::string &ext = "bin") {
+    auto now = std::chrono::system_clock::now();
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    std::ostringstream oss;
+    oss << "upload-" << ms << "." << ext;
+    return oss.str();
+}
+
+static std::string getHeader(const HttpRequest &req, const std::string &key) {
+    auto it = req.headers.find(toLower(key));
+    if (it != req.headers.end()) return it->second;
+    return {};
+}
+
+static bool saveToFile(const fs::path &dir, const std::string &filename, const std::string &data, fs::path &outPath) {
+    try {
+        fs::create_directories(dir);
+        outPath = dir / filename;
+        std::ofstream ofs(outPath, std::ios::binary);
+        if (!ofs) return false;
+        ofs.write(data.data(), static_cast<std::streamsize>(data.size()));
+        return ofs.good();
+    } catch (...) {
+        return false;
+    }
 }
 
 class CTianshanHttp {
