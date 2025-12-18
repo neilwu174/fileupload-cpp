@@ -4,6 +4,7 @@
 
 #ifndef FILEUPLOAD_CUPLOADSERVICE_H
 #define FILEUPLOAD_CUPLOADSERVICE_H
+#include <map>
 #include <string>
 
 struct HttpConfig {

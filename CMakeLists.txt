@@ -15,5 +15,7 @@ FetchContent_MakeAvailable(yaml-cpp)
 add_executable(fileupload main.cpp
         module/CUploadService.cpp
         module/CUploadService.h
+        module/CTianshanHttp.cpp
+        module/CTianshanHttp.h
 )
 target_link_libraries(fileupload PUBLIC yaml-cpp::yaml-cpp) # The library or executable that require yaml-cpp library
