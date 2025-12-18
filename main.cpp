@@ -25,24 +25,6 @@ static int g_listenFd = -1;
 
 HttpConfig yaml;
 
-long get_miiliseconds() {
-    // Get the current time point from the system clock
-    auto now = std::chrono::system_clock::now();
-
-    // Cast the duration since the epoch to milliseconds and get the count
-    auto milliseconds_since_epoch = std::chrono::duration_cast<std::chrono::milliseconds>(
-        now.time_since_epoch()
-    ).count();
-
-    std::cout << "Milliseconds since epoch: " << milliseconds_since_epoch << std::endl;
-    return milliseconds_since_epoch;
-}
-
-std::string get_filename() {
-    long current_time = get_miiliseconds();
-    std::string filename = "photo-" + std::to_string(current_time) + ".jpeg";
-    return filename;
-}
 void handleSigInt(int) {
     g_shouldStop = 1;
     if (g_listenFd >= 0) {
@@ -329,7 +311,7 @@ bool handleMultipart(const std::string &contentType, const std::string &body, fs
                 }
                 if (filename.empty()) filename = generateFileName("bin");
                 fs::path out;
-                if (saveToFile(yaml.uploadFolder, get_filename(), pBody, out)) {
+                if (saveToFile(yaml.uploadFolder, CUploadService::get_filename(), pBody, out)) {
                     savedPath = out;
                     bytesSaved = pBody.size();
                     foundFile = true;
@@ -387,7 +369,6 @@ int main(int argc, const char * argv[]) {
     }
 
     std::cerr << "HTTP server listening on http://0.0.0.0:" << port << "\n";
-    get_miiliseconds();
 
     while (!g_shouldStop) {
         sockaddr_in cli{}; socklen_t clilen = sizeof(cli);
@@ -478,7 +459,7 @@ int main(int argc, const char * argv[]) {
             if (!ok) {
                 // treat entire body as file
                 std::string filename = generateFileName("bin");
-                if (saveToFile(yaml.uploadFolder, get_filename(), req.body, saved)) {
+                if (saveToFile(yaml.uploadFolder, CUploadService::get_filename(), req.body, saved)) {
                     bytes = req.body.size();
                     ok = true;
                 } else {
