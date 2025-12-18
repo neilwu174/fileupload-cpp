@@ -186,15 +186,14 @@ int main(int argc, const char * argv[]) {
 
         // Read headers
         std::string raw;
-        if (!tianshan_http.readHeaders(cfd, raw)) {
+        CTianshanHttpRequest req;
+        if (!req.readHeaders(cfd, raw)) {
             std::string resp = tianshan_http.makeResponse(400, "Bad Request", "text/plain; charset=utf-8", "Malformed headers\n");
             sendAll(cfd, resp);
             ::close(cfd);
             continue;
         }
-        CTianshanHttpRequest req;
-        size_t headerEnd = 0;
-        if (!req.parseRequest(raw, headerEnd)) {
+        if (!req.parseRequest(raw)) {
             std::string resp = tianshan_http.makeResponse(400, "Bad Request", "text/plain; charset=utf-8", "Cannot parse request\n");
             sendAll(cfd, resp);
             ::close(cfd);
@@ -208,11 +207,9 @@ int main(int argc, const char * argv[]) {
             contentLength = static_cast<size_t>(std::strtoull(clh.c_str(), nullptr, 10));
         }
         // Already have some body bytes after header delimiter
-        std::cout << "main() -- headerEnd :: " << headerEnd << std::endl;
-        std::cout << "main() -- raw.size :: " << raw.size() << std::endl;
         std::string bodyAlready;
-        if (headerEnd + 4 < raw.size()) {
-            bodyAlready = raw.substr(headerEnd + 4);
+        if (req.getHeaderEnd() + 4 < raw.size()) {
+            bodyAlready = raw.substr(req.getHeaderEnd() + 4);
         }
         req.setBody(bodyAlready);
         std::cout << "main() -- req.body.size :: " << req.getBody().size() << std::endl;

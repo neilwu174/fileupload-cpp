@@ -13,11 +13,13 @@
 
 class CTianshanHttpRequest {
 private:
+    size_t maxBytes = 64 * 1024;
     std::string method;
     std::string path;
     std::string version;
     std::map<std::string,std::string> headers; // lower-cased keys
     std::string body;
+    size_t headerEnd;
 
 public:
     std::string getMethod() { return method; };
@@ -25,13 +27,15 @@ public:
     std::string getVersion() { return version; };
     std::map<std::string,std::string> getHeaders() { return headers; };
     std::string getBody() { return body; };
+    size_t getHeaderEnd() { return headerEnd; };
     void setBody(std::string body) { this->body = body; };
     void setHeader(std::string key, std::string value) { headers[toLower(key)] = value; };
     void setMethod(std::string method) { this->method = method; };
     void setPath(std::string path) { this->path = path; };
     void setVersion(std::string version) { this->version = version; };
 
-    bool parseRequest(const std::string &raw, size_t &headerEnd);
+    bool readHeaders(int fd, std::string &raw);
+    bool parseRequest(const std::string &raw);
     std::string getHeader(const std::string &key);
 };
 

@@ -79,12 +79,6 @@ static std::string generateFileName(const std::string &ext = "bin") {
     return oss.str();
 }
 
-static std::string getHeader(const HttpRequest &req, const std::string &key) {
-    auto it = req.headers.find(toLower(key));
-    if (it != req.headers.end()) return it->second;
-    return {};
-}
-
 static bool saveToFile(const fs::path &dir, const std::string &filename, const std::string &data, fs::path &outPath) {
     try {
         fs::create_directories(dir);
@@ -100,10 +94,7 @@ static bool saveToFile(const fs::path &dir, const std::string &filename, const s
 
 class CTianshanHttp {
 public:
-    bool parseRequest(const std::string &raw, HttpRequest &req, size_t &headerEnd);
-    bool readHeaders(int fd, std::string &raw);
     std::string makeResponse(int status, const std::string &statusText, const std::string &contentType, const std::string &body, const std::map<std::string,std::string> &extraHeaders = {});
-
 private:
     size_t maxBytes = 64 * 1024;
 };

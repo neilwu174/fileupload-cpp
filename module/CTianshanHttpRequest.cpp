@@ -6,7 +6,23 @@
 
 #include <iostream>
 
-bool CTianshanHttpRequest::parseRequest(const std::string &raw, size_t &headerEnd) {
+bool CTianshanHttpRequest::readHeaders(int fd, std::string &raw) {
+    raw.clear();
+    while (raw.find("\r\n\r\n") == std::string::npos) {
+        char tmp[2048];
+        ssize_t n = ::recv(fd, tmp, sizeof(tmp), 0);
+        if (n < 0) {
+            if (errno == EINTR) continue;
+            return false;
+        }
+        if (n == 0) break; // connection closed
+        raw.append(tmp, tmp + n);
+        if (raw.size() > maxBytes) return false; // too large
+    }
+    return raw.find("\r\n\r\n") != std::string::npos;
+}
+
+bool CTianshanHttpRequest::parseRequest(const std::string &raw) {
     std::cout << "parseRequest(started)------>" << std::endl;
     headerEnd = raw.find("\r\n\r\n");
     std::cout << "parseRequest() headerEnd=" << headerEnd << std::endl;
