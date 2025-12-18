@@ -19,7 +19,12 @@ bool CTianshanHttpRequest::readHeaders(int fd, std::string &raw) {
         raw.append(tmp, tmp + n);
         if (raw.size() > maxBytes) return false; // too large
     }
-    return raw.find("\r\n\r\n") != std::string::npos;
+    bool check = raw.find("\r\n\r\n") != std::string::npos;
+    if (!check) {
+        return false;
+    }
+    parseRequest(raw);
+    return true;
 }
 
 bool CTianshanHttpRequest::parseRequest(const std::string &raw) {

@@ -13,13 +13,6 @@
 
 namespace fs = std::filesystem;
 
-struct HttpRequest {
-    std::string method;
-    std::string path;
-    std::string version;
-    std::map<std::string,std::string> headers; // lower-cased keys
-    std::string body;
-};
 static inline std::string toLower(std::string s) {
     for (auto &c : s) c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
     return s;

@@ -20,6 +20,8 @@ private:
     std::map<std::string,std::string> headers; // lower-cased keys
     std::string body;
     size_t headerEnd;
+private:
+    bool parseRequest(const std::string &raw);
 
 public:
     std::string getMethod() { return method; };
@@ -35,7 +37,6 @@ public:
     void setVersion(std::string version) { this->version = version; };
 
     bool readHeaders(int fd, std::string &raw);
-    bool parseRequest(const std::string &raw);
     std::string getHeader(const std::string &key);
 };
 

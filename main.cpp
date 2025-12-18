@@ -193,12 +193,6 @@ int main(int argc, const char * argv[]) {
             ::close(cfd);
             continue;
         }
-        if (!req.parseRequest(raw)) {
-            std::string resp = tianshan_http.makeResponse(400, "Bad Request", "text/plain; charset=utf-8", "Cannot parse request\n");
-            sendAll(cfd, resp);
-            ::close(cfd);
-            continue;
-        }
 
         // Read body if Content-Length present
         std::string clh = req.getHeader("content-length");
