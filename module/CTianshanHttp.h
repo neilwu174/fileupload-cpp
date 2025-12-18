@@ -6,6 +6,7 @@
 #define FILEUPLOAD_CTIANSHANHTTP_H
 #include <map>
 #include <string>
+#include <sys/socket.h>
 
 struct HttpRequest {
     std::string method;
@@ -32,6 +33,19 @@ static inline std::string httpDate() {
 #endif
     std::strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", &tm);
     return std::string(buf);
+}
+
+static bool sendAll(int fd, const std::string &data) {
+    size_t total = 0;
+    while (total < data.size()) {
+        ssize_t n = ::send(fd, data.data() + total, data.size() - total, 0);
+        if (n < 0) {
+            if (errno == EINTR) continue;
+            return false;
+        }
+        total += static_cast<size_t>(n);
+    }
+    return true;
 }
 
 class CTianshanHttp {

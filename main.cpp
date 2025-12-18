@@ -31,26 +31,6 @@ void handleSigInt(int) {
     }
 }
 
-bool setNonBlocking(int fd) {
-    int flags = fcntl(fd, F_GETFL, 0);
-    if (flags == -1) return false;
-    if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1) return false;
-    return true;
-}
-
-bool sendAll(int fd, const std::string &data) {
-    size_t total = 0;
-    while (total < data.size()) {
-        ssize_t n = ::send(fd, data.data() + total, data.size() - total, 0);
-        if (n < 0) {
-            if (errno == EINTR) continue;
-            return false;
-        }
-        total += static_cast<size_t>(n);
-    }
-    return true;
-}
-
 std::string readAll(int fd, size_t expected) {
     std::string out;
     out.reserve(expected);
@@ -67,22 +47,6 @@ std::string readAll(int fd, size_t expected) {
         out.append(buf, buf + n);
     }
     return out;
-}
-
-std::string makeResponse(int status, const std::string &statusText, const std::string &contentType, const std::string &body, const std::map<std::string,std::string> &extraHeaders = {}) {
-    std::ostringstream oss;
-    oss << "HTTP/1.1 " << status << ' ' << statusText << "\r\n";
-    oss << "Date: " << httpDate() << "\r\n";
-    oss << "Server: UploadService/1.0\r\n";
-    oss << "Content-Type: " << contentType << "\r\n";
-    oss << "Content-Length: " << body.size() << "\r\n";
-    oss << "Connection: close\r\n";
-    for (const auto &kv : extraHeaders) {
-        oss << kv.first << ": " << kv.second << "\r\n";
-    }
-    oss << "\r\n";
-    oss << body;
-    return oss.str();
 }
 
 std::string urlDecode(const std::string &s) {
@@ -287,7 +251,7 @@ int main(int argc, const char * argv[]) {
         // Read headers
         std::string raw;
         if (!tianshan_http.readHeaders(cfd, raw)) {
-            std::string resp = makeResponse(400, "Bad Request", "text/plain; charset=utf-8", "Malformed headers\n");
+            std::string resp = tianshan_http.makeResponse(400, "Bad Request", "text/plain; charset=utf-8", "Malformed headers\n");
             sendAll(cfd, resp);
             ::close(cfd);
             continue;
@@ -295,7 +259,7 @@ int main(int argc, const char * argv[]) {
         HttpRequest req;
         size_t headerEnd = 0;
         if (!tianshan_http.parseRequest(raw, req, headerEnd)) {
-            std::string resp = makeResponse(400, "Bad Request", "text/plain; charset=utf-8", "Cannot parse request\n");
+            std::string resp = tianshan_http.makeResponse(400, "Bad Request", "text/plain; charset=utf-8", "Cannot parse request\n");
             sendAll(cfd, resp);
             ::close(cfd);
             continue;
@@ -329,7 +293,7 @@ int main(int argc, const char * argv[]) {
         std::cout << "main() transferEnc=" << transferEnc << std::endl;
 
         if (!transferEnc.empty() && transferEnc.find("chunked") != std::string::npos) {
-            std::string resp = makeResponse(501, "Not Implemented", "application/json", "{\n  \"ok\": false, \"error\": \"chunked transfer not supported\"\n}\n");
+            std::string resp = tianshan_http.makeResponse(501, "Not Implemented", "application/json", "{\n  \"ok\": false, \"error\": \"chunked transfer not supported\"\n}\n");
             sendAll(cfd, resp);
             ::close(cfd);
             continue;
@@ -345,7 +309,7 @@ int main(int argc, const char * argv[]) {
                 "<input type=\"file\" name=\"file\" />"
                 "<button type=\"submit\">Upload</button>"
                 "</form></body></html>";
-            response = makeResponse(200, "OK", "text/html; charset=utf-8", html);
+            response = tianshan_http.makeResponse(200, "OK", "text/html; charset=utf-8", html);
         } else if (req.method == "POST" && req.path == "/upload") {
             fs::path saved;
             size_t bytes = 0;
@@ -357,7 +321,7 @@ int main(int argc, const char * argv[]) {
                 ok = handleMultipart(ctype, req.body, saved, bytes);
                 if (!ok) {
                     std::string body = "{\n  \"ok\": false, \"error\": \"invalid multipart form data\"\n}\n";
-                    response = makeResponse(400, "Bad Request", "application/json", body);
+                    response = tianshan_http.makeResponse(400, "Bad Request", "application/json", body);
                 }
             }
             if (!ok) {
@@ -368,19 +332,19 @@ int main(int argc, const char * argv[]) {
                     ok = true;
                 } else {
                     std::string body = "{\n  \"ok\": false, \"error\": \"failed to save file\"\n}\n";
-                    response = makeResponse(500, "Internal Server Error", "application/json", body);
+                    response = tianshan_http.makeResponse(500, "Internal Server Error", "application/json", body);
                 }
             }
             if (ok) {
                 std::ostringstream json;
                 json << "{\n  \"ok\": true, \"filename\": \"" << saved.string() << "\", \"bytes\": " << bytes << "\n}\n";
-                response = makeResponse(200, "OK", "application/json", json.str());
+                response = tianshan_http.makeResponse(200, "OK", "application/json", json.str());
                 std::cerr << "Saved file: " << saved << " (" << bytes << " bytes)\n";
             }
         } else if (req.method == "GET" || req.method == "POST" || req.method == "HEAD" || req.method == "PUT" || req.method == "DELETE") {
-            response = makeResponse(404, "Not Found", "text/plain; charset=utf-8", "Not Found\n");
+            response = tianshan_http.makeResponse(404, "Not Found", "text/plain; charset=utf-8", "Not Found\n");
         } else {
-            response = makeResponse(405, "Method Not Allowed", "text/plain; charset=utf-8", "Method Not Allowed\n", {{"Allow", "GET, POST"}});
+            response = tianshan_http.makeResponse(405, "Method Not Allowed", "text/plain; charset=utf-8", "Method Not Allowed\n", {{"Allow", "GET, POST"}});
         }
 
         sendAll(cfd, response);
