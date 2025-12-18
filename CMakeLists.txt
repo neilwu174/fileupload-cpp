@@ -17,5 +17,7 @@ add_executable(fileupload main.cpp
         module/CUploadService.h
         module/CTianshanHttp.cpp
         module/CTianshanHttp.h
+        module/CTianshanHttpRequest.cpp
+        module/CTianshanHttpRequest.h
 )
 target_link_libraries(fileupload PUBLIC yaml-cpp::yaml-cpp) # The library or executable that require yaml-cpp library

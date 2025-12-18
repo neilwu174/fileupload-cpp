@@ -15,6 +15,7 @@
 #include <chrono>
 
 #include "module/CTianshanHttp.h"
+#include "module/CTianshanHttpRequest.h"
 #include "module/CUploadService.h"
 
 namespace fs = std::filesystem;
@@ -191,9 +192,9 @@ int main(int argc, const char * argv[]) {
             ::close(cfd);
             continue;
         }
-        HttpRequest req;
+        CTianshanHttpRequest req;
         size_t headerEnd = 0;
-        if (!tianshan_http.parseRequest(raw, req, headerEnd)) {
+        if (!req.parseRequest(raw, headerEnd)) {
             std::string resp = tianshan_http.makeResponse(400, "Bad Request", "text/plain; charset=utf-8", "Cannot parse request\n");
             sendAll(cfd, resp);
             ::close(cfd);
@@ -201,7 +202,7 @@ int main(int argc, const char * argv[]) {
         }
 
         // Read body if Content-Length present
-        std::string clh = getHeader(req, "content-length");
+        std::string clh = req.getHeader("content-length");
         size_t contentLength = 0;
         if (!clh.empty()) {
             contentLength = static_cast<size_t>(std::strtoull(clh.c_str(), nullptr, 10));
@@ -213,17 +214,15 @@ int main(int argc, const char * argv[]) {
         if (headerEnd + 4 < raw.size()) {
             bodyAlready = raw.substr(headerEnd + 4);
         }
-        req.body = bodyAlready;
-        std::cout << "main() -- req.body.size :: " << req.body.size() << std::endl;
+        req.setBody(bodyAlready);
+        std::cout << "main() -- req.body.size :: " << req.getBody().size() << std::endl;
         std::cout << "main() -- contentLength :: " << contentLength << std::endl;
-        if (req.body.size() < contentLength) {
-            std::string rest = readAll(cfd, contentLength - req.body.size());
-            req.body += rest;
+        if (req.getBody().size() < contentLength) {
+            std::string rest = readAll(cfd, contentLength - req.getBody().size());
+            req.setBody(req.getBody() + rest);
         }
 
-        std::cerr << req.method << " " << req.path << " (" << req.body.size() << " bytes)\n";
-
-        std::string transferEnc = toLower(getHeader(req, "transfer-encoding"));
+        std::string transferEnc = toLower(req.getHeader("transfer-encoding"));
 
         std::cout << "main() transferEnc=" << transferEnc << std::endl;
 
@@ -234,9 +233,8 @@ int main(int argc, const char * argv[]) {
             continue;
         }
 
-        std::cout << "main() http method=" << req.method << ",path=" << req.path << std::endl;
         std::string response;
-        if (req.method == "GET" && req.path == "/") {
+        if (req.getMethod() == "GET" && req.getPath() == "/") {
             std::string html =
                 "<!doctype html>\n<html><head><meta charset=\"utf-8\"><title>Upload</title></head>"
                 "<body><h1>Upload</h1>"
@@ -245,15 +243,14 @@ int main(int argc, const char * argv[]) {
                 "<button type=\"submit\">Upload</button>"
                 "</form></body></html>";
             response = tianshan_http.makeResponse(200, "OK", "text/html; charset=utf-8", html);
-        } else if (req.method == "POST" && req.path == "/upload") {
+        } else if (req.getMethod() == "POST" && req.getPath() == "/upload") {
             fs::path saved;
             size_t bytes = 0;
 //            std::string ctype = toLower(getHeader(req, "content-type"));
-            std::string ctype = getHeader(req, "content-type");
-            std::cout << "main() ctype=" << ctype << std::endl;
+            std::string ctype = req.getHeader("content-type");
             bool ok = false;
             if (ctype.find("multipart/form-data") != std::string::npos) {
-                ok = handleMultipart(ctype, req.body, saved, bytes);
+                ok = handleMultipart(ctype, req.getBody(), saved, bytes);
                 if (!ok) {
                     std::string body = "{\n  \"ok\": false, \"error\": \"invalid multipart form data\"\n}\n";
                     response = tianshan_http.makeResponse(400, "Bad Request", "application/json", body);
@@ -262,8 +259,8 @@ int main(int argc, const char * argv[]) {
             if (!ok) {
                 // treat entire body as file
                 std::string filename = generateFileName("bin");
-                if (saveToFile(yaml.uploadFolder, CUploadService::get_filename(), req.body, saved)) {
-                    bytes = req.body.size();
+                if (saveToFile(yaml.uploadFolder, CUploadService::get_filename(), req.getBody(), saved)) {
+                    bytes = req.getBody().size();
                     ok = true;
                 } else {
                     std::string body = "{\n  \"ok\": false, \"error\": \"failed to save file\"\n}\n";
@@ -276,7 +273,7 @@ int main(int argc, const char * argv[]) {
                 response = tianshan_http.makeResponse(200, "OK", "application/json", json.str());
                 std::cerr << "Saved file: " << saved << " (" << bytes << " bytes)\n";
             }
-        } else if (req.method == "GET" || req.method == "POST" || req.method == "HEAD" || req.method == "PUT" || req.method == "DELETE") {
+        } else if (req.getMethod() == "GET" || req.getMethod() == "POST" || req.getMethod() == "HEAD" || req.getMethod() == "PUT" || req.getMethod() == "DELETE") {
             response = tianshan_http.makeResponse(404, "Not Found", "text/plain; charset=utf-8", "Not Found\n");
         } else {
             response = tianshan_http.makeResponse(405, "Method Not Allowed", "text/plain; charset=utf-8", "Method Not Allowed\n", {{"Allow", "GET, POST"}});
