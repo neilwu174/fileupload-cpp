@@ -13,12 +13,9 @@ struct HttpConfig {
     int port;
 };
 
-class CUploadService {
+class CTianshanHttpService {
 public:
     void load_config(HttpConfig& config);
-    static std::string get_filename();
-private:
-    static long get_miiliseconds();
 };
 
 

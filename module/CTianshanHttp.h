@@ -64,27 +64,6 @@ static std::string readAll(int fd, size_t expected) {
     return out;
 }
 
-static std::string generateFileName(const std::string &ext = "bin") {
-    auto now = std::chrono::system_clock::now();
-    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-    std::ostringstream oss;
-    oss << "upload-" << ms << "." << ext;
-    return oss.str();
-}
-
-static bool saveToFile(const fs::path &dir, const std::string &filename, const std::string &data, fs::path &outPath) {
-    try {
-        fs::create_directories(dir);
-        outPath = dir / filename;
-        std::ofstream ofs(outPath, std::ios::binary);
-        if (!ofs) return false;
-        ofs.write(data.data(), static_cast<std::streamsize>(data.size()));
-        return ofs.good();
-    } catch (...) {
-        return false;
-    }
-}
-
 class CTianshanHttp {
 public:
     std::string makeResponse(int status, const std::string &statusText, const std::string &contentType, const std::string &body, const std::map<std::string,std::string> &extraHeaders = {});

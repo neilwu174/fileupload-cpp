@@ -13,8 +13,8 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(yaml-cpp)
 
 add_executable(fileupload main.cpp
-        module/CUploadService.cpp
-        module/CUploadService.h
+        module/CTianshanHttpService.cpp
+        module/CTianshanHttpService.h
         module/CTianshanHttp.cpp
         module/CTianshanHttp.h
         module/CTianshanHttpRequest.cpp

@@ -15,6 +15,10 @@ class CTianshanMultipartHandler {
 private:
     std::filesystem::path uploadDir;
     size_t bytesSaved;
+private:
+    std::string get_filename();
+    long get_miiliseconds();
+    std::string generateFileName(const std::string &ext = "bin");
 
 public:
     CTianshanMultipartHandler(std::string uploadFolder) : uploadDir(uploadFolder) {}

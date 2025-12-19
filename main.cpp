@@ -17,7 +17,7 @@
 #include "module/CTianshanHttp.h"
 #include "module/CTianshanHttpRequest.h"
 #include "module/CTianshanMultipartHandler.h"
-#include "module/CUploadService.h"
+#include "module/CTianshanHttpService.h"
 
 namespace fs = std::filesystem;
 
@@ -35,7 +35,7 @@ void handleSigInt(int) {
 
 int main(int argc, const char * argv[]) {
     std::signal(SIGINT, handleSigInt);
-    CUploadService upload_service;
+    CTianshanHttpService upload_service;
     CTianshanHttp tianshan_http;
 
     upload_service.load_config(yaml);

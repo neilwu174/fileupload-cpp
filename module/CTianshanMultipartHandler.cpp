@@ -11,7 +11,6 @@
 #include <string>
 
 #include "CTianshanHttp.h"
-#include "CUploadService.h"
 #include "CTianshanHttpRequest.h"
 
 bool CTianshanMultipartHandler::saveToFile(const std::string &filename, const std::string &data, fs::path &outPath) {
@@ -42,6 +41,36 @@ std::string CTianshanMultipartHandler::extractParam(const std::string &headerVal
         return headerValue.substr(pos, end == std::string::npos ? std::string::npos : end - pos);
     }
     return {};
+}
+
+std::string CTianshanMultipartHandler::get_filename() {
+    long current_time = get_miiliseconds();
+    std::string filename = "photo-" + std::to_string(current_time) + ".jpeg";
+    return filename;
+}
+
+/*
+ * private method
+ */
+long CTianshanMultipartHandler::get_miiliseconds() {
+    // Get the current time point from the system clock
+    auto now = std::chrono::system_clock::now();
+
+    // Cast the duration since the epoch to milliseconds and get the count
+    auto milliseconds_since_epoch = std::chrono::duration_cast<std::chrono::milliseconds>(
+        now.time_since_epoch()
+    ).count();
+
+    std::cout << "Milliseconds since epoch: " << milliseconds_since_epoch << std::endl;
+    return milliseconds_since_epoch;
+}
+
+std::string CTianshanMultipartHandler::generateFileName(const std::string &ext) {
+    auto now = std::chrono::system_clock::now();
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    std::ostringstream oss;
+    oss << "upload-" << ms << "." << ext;
+    return oss.str();
 }
 
 bool CTianshanMultipartHandler::handle(
@@ -123,7 +152,7 @@ bool CTianshanMultipartHandler::handle(
                 }
                 if (filename.empty()) filename = generateFileName("bin");
                 fs::path out;
-                if (this->saveToFile(CUploadService::get_filename(), pBody, out)) {
+                if (this->saveToFile(get_filename(), pBody, out)) {
                     savedPath = out;
                     bytesSaved = pBody.size();
                     foundFile = true;
@@ -135,3 +164,4 @@ bool CTianshanMultipartHandler::handle(
     }
     return foundFile;
 }
+
