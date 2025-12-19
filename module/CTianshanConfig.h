@@ -13,7 +13,7 @@ struct HttpConfig {
     int port;
 };
 
-class CTianshanCinfig {
+class CTianshanConfig {
 public:
     void load_config(HttpConfig& config);
 };
