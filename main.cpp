@@ -9,6 +9,8 @@
 #include <fstream>
 #include <filesystem>
 #include <iostream>
+#include <future>
+
 #include "module/CTianshanConfig.h"
 #include "module/CTianshanHttpController.h"
 
@@ -27,10 +29,10 @@ void handleSigInt(int) {
 int main(int argc, const char * argv[]) {
     std::signal(SIGINT, handleSigInt);
 
-    CTianshanConfig httpConfig;
-    httpConfig.load_config();
+    CTianshanConfig *httpConfig = new CTianshanConfig();
+    httpConfig->load_config();
 
-    int port = httpConfig.getPort();
+    int port = httpConfig->getPort();
     g_listenFd = ::socket(AF_INET, SOCK_STREAM, 0);
     if (g_listenFd < 0) {
         std::cerr << "Failed to create socket: " << std::strerror(errno) << "\n";
@@ -66,10 +68,17 @@ int main(int argc, const char * argv[]) {
             // transient error
             continue;
         }
-        CTianshanHttpController controller;
-        controller.accept(cfd,httpConfig);
+        /*
+         * Handle http request in an asyc mode
+         */
+        std::future<void> f = std::async(std::launch::async, [=] {
+            CTianshanHttpController controller;
+            controller.accept(cfd,*httpConfig);
+            }
+        );
     }
 
     std::cerr << "Shutting down.\n";
+    delete httpConfig;
     return EXIT_SUCCESS;
 }
