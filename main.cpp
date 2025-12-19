@@ -17,7 +17,7 @@
 #include "module/CTianshanHttp.h"
 #include "module/CTianshanHttpRequest.h"
 #include "module/CTianshanMultipartHandler.h"
-#include "module/CTianshanHttpService.h"
+#include "module/CTianshanCinfig.h"
 
 namespace fs = std::filesystem;
 
@@ -35,7 +35,7 @@ void handleSigInt(int) {
 
 int main(int argc, const char * argv[]) {
     std::signal(SIGINT, handleSigInt);
-    CTianshanHttpService upload_service;
+    CTianshanCinfig upload_service;
     CTianshanHttp tianshan_http;
 
     upload_service.load_config(yaml);
@@ -106,9 +106,6 @@ int main(int argc, const char * argv[]) {
         }
 
         std::string transferEnc = toLower(req.getHeader("transfer-encoding"));
-
-        std::cout << "main() transferEnc=" << transferEnc << std::endl;
-
         if (!transferEnc.empty() && transferEnc.find("chunked") != std::string::npos) {
             std::string resp = tianshan_http.makeResponse(501, "Not Implemented", "application/json", "{\n  \"ok\": false, \"error\": \"chunked transfer not supported\"\n}\n");
             sendAll(cfd, resp);

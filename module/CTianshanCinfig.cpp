@@ -2,7 +2,7 @@
 // Created by developer on 2025-12-17.
 //
 
-#include "CTianshanHttpService.h"
+#include "CTianshanCinfig.h"
 
 #include <iostream>
 
@@ -11,7 +11,7 @@
 /*
  * public method
  */
-void CTianshanHttpService::load_config(HttpConfig& yaml) {
+void CTianshanCinfig::load_config(HttpConfig& yaml) {
     YAML::Node config = YAML::LoadFile("../application.yaml");
     std::string uploadFolder = config["upload"].as<std::string>();
     std::cout << "uploadFolder: " << uploadFolder << std::endl;
