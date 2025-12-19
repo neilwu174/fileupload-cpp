@@ -12,6 +12,7 @@
 
 #include "CTianshanHttp.h"
 #include "CUploadService.h"
+#include "CTianshanHttpRequest.h"
 
 bool CTianshanMultipartHandler::saveToFile(const std::string &filename, const std::string &data, fs::path &outPath) {
     try {
@@ -44,14 +45,13 @@ std::string CTianshanMultipartHandler::extractParam(const std::string &headerVal
 }
 
 bool CTianshanMultipartHandler::handle(
-    const std::string &contentType,
-    const std::string &body,
+    CTianshanHttpRequest& request,
     std::filesystem::path &savedPath,
     size_t &bytesSaved) {
 
-    auto bpos = contentType.find("boundary=");
+    auto bpos = request.getContentType().find("boundary=");
     if (bpos == std::string::npos) return false;
-    std::string boundary = contentType.substr(bpos + 9);
+    std::string boundary = request.getContentType().substr(bpos + 9);
     if (!boundary.empty() && boundary.front() == '"' && boundary.back() == '"') {
         boundary = boundary.substr(1, boundary.size() - 2);
     }
@@ -66,6 +66,7 @@ bool CTianshanMultipartHandler::handle(
     bool foundFile = false;
     std::cout << "handleMultipart(loop)" << std::endl;
     while (true) {
+        std::string body = request.getBody();
         size_t start = body.find(sep, pos);
         std::cout << "handleMultiPart() start=" << start << std::endl;
         std::cout << "handleMultiPart() std::string::npos=" << std::string::npos << std::endl;

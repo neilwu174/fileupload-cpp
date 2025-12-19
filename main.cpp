@@ -134,21 +134,10 @@ int main(int argc, const char * argv[]) {
             bool ok = false;
             if (ctype.find("multipart/form-data") != std::string::npos) {
                 CTianshanMultipartHandler handler(yaml.uploadFolder);
-                ok = handler.handle(ctype, req.getBody(), saved, bytes);
+                ok = handler.handle(req, saved, bytes);
                 if (!ok) {
                     std::string body = "{\n  \"ok\": false, \"error\": \"invalid multipart form data\"\n}\n";
                     response = tianshan_http.makeResponse(400, "Bad Request", "application/json", body);
-                }
-            }
-            if (!ok) {
-                // treat entire body as file
-                std::string filename = generateFileName("bin");
-                if (saveToFile(yaml.uploadFolder, CUploadService::get_filename(), req.getBody(), saved)) {
-                    bytes = req.getBody().size();
-                    ok = true;
-                } else {
-                    std::string body = "{\n  \"ok\": false, \"error\": \"failed to save file\"\n}\n";
-                    response = tianshan_http.makeResponse(500, "Internal Server Error", "application/json", body);
                 }
             }
             if (ok) {

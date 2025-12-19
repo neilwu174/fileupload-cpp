@@ -24,6 +24,8 @@ private:
     bool parseRequest(const std::string &raw);
 
 public:
+    CTianshanHttpRequest() = default;
+
     std::string getMethod() { return method; };
     std::string getPath() { return path; };
     std::string getVersion() { return version; };
@@ -35,6 +37,10 @@ public:
     void setMethod(std::string method) { this->method = method; };
     void setPath(std::string path) { this->path = path; };
     void setVersion(std::string version) { this->version = version; };
+
+    std::string getContentType() {
+        return getHeader("content-type");
+    }
 
     bool readHeaders(int fd, std::string &raw);
     std::string getHeader(const std::string &key);
