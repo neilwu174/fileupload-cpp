@@ -7,6 +7,21 @@
 #include <string>
 #include <sstream>
 
+static inline std::string httpDate() {
+    using namespace std::chrono;
+    auto now = system_clock::now();
+    std::time_t t = system_clock::to_time_t(now);
+    char buf[128] = {0};
+    std::tm tm{};
+#if defined(__APPLE__)
+    gmtime_r(&t, &tm);
+#else
+    tm = *std::gmtime(&t);
+#endif
+    std::strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", &tm);
+    return std::string(buf);
+}
+
 std::string CTianshanHttpResponseHandler::makeResponse(int status, const std::string &statusText, const std::string &contentType, const std::string &body, const std::map<std::string,std::string> &extraHeaders) {
     std::ostringstream oss;
     oss << "HTTP/1.1 " << status << ' ' << statusText << "\r\n";

@@ -11,6 +11,11 @@
 
 #include "CTianshanHttpResponseHandler.h"
 
+static inline std::string toLower(std::string s) {
+    for (auto &c : s) c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+    return s;
+}
+
 class CTianshanHttpRequest {
 private:
     size_t maxBytes = 64 * 1024;
