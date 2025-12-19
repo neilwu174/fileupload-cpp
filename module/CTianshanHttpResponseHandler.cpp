@@ -2,12 +2,12 @@
 // Created by developer on 2025-12-18.
 //
 
-#include "CTianshanHttp.h"
+#include "CTianshanHttpResponseHandler.h"
 
 #include <string>
 #include <sstream>
 
-std::string CTianshanHttp::makeResponse(int status, const std::string &statusText, const std::string &contentType, const std::string &body, const std::map<std::string,std::string> &extraHeaders) {
+std::string CTianshanHttpResponseHandler::makeResponse(int status, const std::string &statusText, const std::string &contentType, const std::string &body, const std::map<std::string,std::string> &extraHeaders) {
     std::ostringstream oss;
     oss << "HTTP/1.1 " << status << ' ' << statusText << "\r\n";
     oss << "Date: " << httpDate() << "\r\n";

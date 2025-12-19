@@ -15,11 +15,13 @@ FetchContent_MakeAvailable(yaml-cpp)
 add_executable(fileupload main.cpp
         module/CTianshanConfig.cpp
         module/CTianshanConfig.h
-        module/CTianshanHttp.cpp
-        module/CTianshanHttp.h
+        module/CTianshanHttpResponseHandler.cpp
+        module/CTianshanHttpResponseHandler.h
         module/CTianshanHttpRequest.cpp
         module/CTianshanHttpRequest.h
         module/CTianshanMultipartHandler.cpp
         module/CTianshanMultipartHandler.h
+        module/CTianshanHttpController.cpp
+        module/CTianshanHttpController.h
 )
 target_link_libraries(fileupload PUBLIC yaml-cpp::yaml-cpp) # The library or executable that require yaml-cpp library

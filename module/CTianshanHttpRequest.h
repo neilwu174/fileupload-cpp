@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-#include "CTianshanHttp.h"
+#include "CTianshanHttpResponseHandler.h"
 
 class CTianshanHttpRequest {
 private:

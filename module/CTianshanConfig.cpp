@@ -11,7 +11,7 @@
 /*
  * public method
  */
-void CTianshanConfig::load_config(HttpConfig& yaml) {
+void CTianshanConfig::load_config() {
     YAML::Node config = YAML::LoadFile("../application.yaml");
     std::string uploadFolder = config["upload"].as<std::string>();
     std::cout << "uploadFolder: " << uploadFolder << std::endl;
@@ -21,7 +21,7 @@ void CTianshanConfig::load_config(HttpConfig& yaml) {
     int db_port = config["server"]["port"].as<int>();
     std::cout << "Server Host: " << db_host << ", Port: " << db_port << std::endl;
     // HttpConfig yaml = {uploadFolder, db_host, std::to_string(db_port)};
-    yaml.port = db_port;
-    yaml.uploadFolder = uploadFolder;
-    yaml.host = db_host;
+    this->port = db_port;
+    this->uploadFolder = uploadFolder;
+    this->host = db_host;
 }

@@ -64,7 +64,7 @@ static std::string readAll(int fd, size_t expected) {
     return out;
 }
 
-class CTianshanHttp {
+class CTianshanHttpResponseHandler {
 public:
     std::string makeResponse(int status, const std::string &statusText, const std::string &contentType, const std::string &body, const std::map<std::string,std::string> &extraHeaders = {});
 private:

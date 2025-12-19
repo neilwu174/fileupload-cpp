@@ -10,7 +10,7 @@
 #include <ostream>
 #include <string>
 
-#include "CTianshanHttp.h"
+#include "CTianshanHttpResponseHandler.h"
 #include "CTianshanHttpRequest.h"
 
 bool CTianshanMultipartHandler::saveToFile(const std::string &filename, const std::string &data, fs::path &outPath) {
