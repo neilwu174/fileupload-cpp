@@ -5,6 +5,9 @@
 #include "CTianshanHttpRequest.h"
 
 #include <iostream>
+#include <unistd.h>
+
+#include "CTianshanHttpController.h"
 
 bool CTianshanHttpRequest::readHeaders(int fd, std::string &raw) {
     raw.clear();
@@ -24,6 +27,33 @@ bool CTianshanHttpRequest::readHeaders(int fd, std::string &raw) {
         return false;
     }
     parseRequest(raw);
+    return true;
+}
+
+bool CTianshanHttpRequest::accept(int incoming) {
+    std::string raw;
+    if (!this->readHeaders(incoming, raw)) {
+        return false;
+    }
+
+    // Read body if Content-Length present
+    std::string clh = this->getHeader("content-length");
+    size_t contentLength = 0;
+    if (!clh.empty()) {
+        contentLength = static_cast<size_t>(std::strtoull(clh.c_str(), nullptr, 10));
+    }
+    // Already have some body bytes after header delimiter
+    std::string bodyAlready;
+    if (this->getHeaderEnd() + 4 < raw.size()) {
+        bodyAlready = raw.substr(this->getHeaderEnd() + 4);
+    }
+    this->setBody(bodyAlready);
+    std::cout << "main() -- httpRequest.body.size :: " << this->getBody().size() << std::endl;
+    std::cout << "main() -- contentLength :: " << contentLength << std::endl;
+    if (this->getBody().size() < contentLength) {
+        std::string rest = readAll(incoming, contentLength - this->getBody().size());
+        this->setBody(this->getBody() + rest);
+    }
     return true;
 }
 
@@ -67,4 +97,8 @@ std::string CTianshanHttpRequest::getHeader(const std::string &key) {
     auto it = this->headers.find(toLower(key));
     if (it != this->headers.end()) return it->second;
     return {};
+}
+
+bool CTianshanHttpRequest::route(const char * method, const char * path) {
+    return this->method == method && this->path == path;
 }

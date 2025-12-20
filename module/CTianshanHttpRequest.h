@@ -27,11 +27,18 @@ private:
     size_t headerEnd;
 private:
     bool parseRequest(const std::string &raw);
+    bool readHeaders(int fd, std::string &raw);
+
+public:
+    inline static const std::string HTTP_POST = "POST";
+    inline static const std::string HTTP_GET = "GET";
 
 public:
     CTianshanHttpRequest() = default;
 
-    std::string getMethod() { return method; };
+    std::string getMethod() { return method; }
+
+    bool route(const char * str, const char * text);;
     std::string getPath() { return path; };
     std::string getVersion() { return version; };
     std::map<std::string,std::string> getHeaders() { return headers; };
@@ -47,7 +54,7 @@ public:
         return getHeader("content-type");
     }
 
-    bool readHeaders(int fd, std::string &raw);
+    bool accept(int fd);
     std::string getHeader(const std::string &key);
 };
 
