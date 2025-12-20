@@ -72,8 +72,34 @@ std::string CTianshanMultipartHandler::generateFileName(const std::string &ext) 
     oss << "upload-" << ms << "." << ext;
     return oss.str();
 }
+std::string CTianshanMultipartHandler::accept(CTianshanHttpRequest& request) {
 
-bool CTianshanMultipartHandler::handle(
+    CTianshanHttpResponseHandler httpResponse;
+
+    fs::path saved;
+    size_t bytes = 0;
+    //            std::string ctype = toLower(getHeader(httpRequest, "content-type"));
+    std::string ctype = request.getHeader("content-type");
+    bool ok = false;
+    std::string response;
+
+    if (ctype.find("multipart/form-data") != std::string::npos) {
+        ok = this->acceptInternal(request, saved, bytes);
+        if (!ok) {
+            std::string body = "{\n  \"ok\": false, \"error\": \"invalid multipart form data\"\n}\n";
+            response = httpResponse.makeResponse(400, "Bad httpRequestuest", "application/json", body);
+        }
+    }
+    if (ok) {
+        std::ostringstream json;
+        json << "{\n  \"ok\": true, \"filename\": \"" << saved.string() << "\", \"bytes\": " << bytes << "\n}\n";
+        response = httpResponse.makeResponse(200, "OK", "application/json", json.str());
+        std::cerr << "Saved file: " << saved << " (" << bytes << " bytes)\n";
+    }
+    return response;
+}
+
+bool CTianshanMultipartHandler::acceptInternal(
     CTianshanHttpRequest& request,
     std::filesystem::path &savedPath,
     size_t &bytesSaved) {

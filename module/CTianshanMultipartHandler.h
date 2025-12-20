@@ -19,11 +19,12 @@ private:
     std::string get_filename();
     long get_miiliseconds();
     std::string generateFileName(const std::string &ext = "bin");
+    bool acceptInternal(CTianshanHttpRequest& request, std::filesystem::path &savedPath, size_t &bytesSaved);
 
 public:
     CTianshanMultipartHandler(std::string uploadFolder) : uploadDir(uploadFolder) {}
     std::string extractParam(const std::string &headerValue, const std::string &param);
-    bool handle(CTianshanHttpRequest& request, std::filesystem::path &savedPath, size_t &bytesSaved);
+    std::string accept(CTianshanHttpRequest& request);
     bool saveToFile(const std::string &filename, const std::string &data, std::filesystem::path &outPath);
 };
 
