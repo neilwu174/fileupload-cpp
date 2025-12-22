@@ -70,7 +70,7 @@ void CTianshanHttpController::proceed(int incoming, CTianshanConfig& config) {
     if (this->routes.count(routeKey)) {
         auto handler = this->routes[routeKey];
         CTianshanHttpResponse http_response = handler(httpRequest);
-        response = http_response.getResponse();
+        response = http_response.getBody();
     } else {
         response = httpResponse.makeResponse(404, "Not Found", "text/plain; charset=utf-8", "Not Found\n");
     }

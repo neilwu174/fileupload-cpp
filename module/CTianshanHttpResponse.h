@@ -9,11 +9,12 @@
 
 class CTianshanHttpResponse {
 private:
-    std::string response;
+    std::string body;
 
 public:
-    CTianshanHttpResponse(std::string response):response(response){};
-    std::string getResponse(){return this->response;}
+    CTianshanHttpResponse(std::string response):body(response){};
+    std::string getBody(){return this->body;}
 };
 
 #endif //FILEUPLOAD_CTIANSHANHTTPRESPONSE_H
+
