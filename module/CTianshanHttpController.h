@@ -7,6 +7,8 @@
 #include <sys/socket.h>
 
 #include "CTianshanConfig.h"
+#include "CTianshanHttpRequest.h"
+#include "CTianshanHttpResponse.h"
 
 static bool sendAll(int fd, const std::string &data) {
     size_t total = 0;
@@ -40,9 +42,15 @@ static std::string readAll(int fd, size_t expected) {
 }
 
 class CTianshanHttpController {
-
+private:
+    std::map<std::string,std::function<CTianshanHttpResponse(CTianshanHttpRequest&)>> routes;
+    std::function<CTianshanHttpResponse(CTianshanHttpRequest&)> getHandler(const char * method, const char * path) {
+        return routes[std::string(method) + "-" + std::string(path)];
+    }
 public:
     void accept(int incoming,CTianshanConfig& config);
+    void proceed(int incoming,CTianshanConfig& config);
+    void route(const char * method, const char * path,CTianshanConfig& config,std::function<std::string(CTianshanHttpRequest&)> httpHandler);
 };
 
 #endif //FILEUPLOAD_CTIANSHANHTTPCONTROLLER_H

@@ -13,6 +13,7 @@
 
 #include "module/CTianshanConfig.h"
 #include "module/CTianshanHttpController.h"
+#include "module/CTianshanMultipartHandler.h"
 
 namespace fs = std::filesystem;
 
@@ -73,9 +74,12 @@ int main(int argc, const char * argv[]) {
          */
         std::future<void> f = std::async(std::launch::async, [=] {
             CTianshanHttpController controller;
-            controller.accept(cfd,*httpConfig);
-            }
-        );
+            controller.route("POST","/upload",*httpConfig,[httpConfig](CTianshanHttpRequest& httpRequest)->std::string {
+                CTianshanMultipartHandler handler = CTianshanMultipartHandler(httpConfig->getUploadFolder());
+                return handler.accept(httpRequest);
+            });
+            controller.proceed(cfd,*httpConfig);
+        });
     }
 
     std::cerr << "Shutting down.\n";

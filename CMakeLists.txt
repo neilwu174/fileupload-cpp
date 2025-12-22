@@ -12,6 +12,14 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(yaml-cpp)
 
+FetchContent_Declare(
+        nlohmann
+        GIT_REPOSITORY git@github.com:nlohmann/json.git
+        GIT_TAG master # Can be a tag (yaml-cpp-x.x.x), a commit hash, or a branch name (master)
+)
+
+FetchContent_MakeAvailable(nlohmann)
+
 add_executable(fileupload main.cpp
         module/CTianshanConfig.cpp
         module/CTianshanConfig.h
@@ -23,5 +31,8 @@ add_executable(fileupload main.cpp
         module/CTianshanMultipartHandler.h
         module/CTianshanHttpController.cpp
         module/CTianshanHttpController.h
+        module/tianshan_functions.h
+        module/CTianshanHttpResponse.cpp
+        module/CTianshanHttpResponse.h
 )
-target_link_libraries(fileupload PUBLIC yaml-cpp::yaml-cpp) # The library or executable that require yaml-cpp library
+target_link_libraries(fileupload PUBLIC yaml-cpp::yaml-cpp nlohmann_json::nlohmann_json) # The library or executable that require yaml-cpp library

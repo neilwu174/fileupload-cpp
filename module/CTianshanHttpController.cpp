@@ -51,3 +51,34 @@ void CTianshanHttpController::accept(int incoming,CTianshanConfig& config) {
     sendAll(incoming, response);
     ::close(incoming);
 }
+
+void CTianshanHttpController::proceed(int incoming, CTianshanConfig& config) {
+
+    CTianshanHttpRequest httpRequest;
+    CTianshanHttpResponseHandler httpResponse;
+
+    if (!httpRequest.accept(incoming)) {
+        std::string resp = httpResponse.makeResponse(400, "Bad httpRequestuest", "text/plain; charset=utf-8", "Malformed headers\n");
+        sendAll(incoming, resp);
+        ::close(incoming);
+        return;
+    }
+
+    std::string routeKey = httpRequest.getMethod() + "-" + httpRequest.getPath();
+    std::string response;
+
+    if (this->routes.count(routeKey)) {
+        auto handler = this->routes[routeKey];
+        CTianshanHttpResponse http_response = handler(httpRequest);
+        response = http_response.getResponse();
+    } else {
+        response = httpResponse.makeResponse(404, "Not Found", "text/plain; charset=utf-8", "Not Found\n");
+    }
+    sendAll(incoming, response);
+    ::close(incoming);
+}
+
+void CTianshanHttpController::route(const char *method, const char *path, CTianshanConfig &config,
+    std::function<std::string(CTianshanHttpRequest &)> httpHandler) {
+    this->routes.emplace(std::string(method) + "-" + std::string(path), httpHandler);
+}

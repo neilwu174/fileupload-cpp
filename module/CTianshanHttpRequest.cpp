@@ -8,6 +8,7 @@
 #include <unistd.h>
 
 #include "CTianshanHttpController.h"
+#include "CTianshanHttpResponse.h"
 
 bool CTianshanHttpRequest::readHeaders(int fd, std::string &raw) {
     raw.clear();
