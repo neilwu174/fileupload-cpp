@@ -40,12 +40,14 @@ void CTianshanHttpController::accept(int incoming,CTianshanConfig& config) {
             "<input type=\"file\" name=\"file\" />"
             "<button type=\"submit\">Upload</button>"
             "</form></body></html>";
-        response = httpResponse.makeResponse(200, "OK", "text/html; charset=utf-8", html);
+        CTianshanHttpResponse http_response(200,"OK","TianshanWeb","text/html; charset=utf-8",html);
     } else if (httpRequest.route("POST","/upload")) {
         CTianshanMultipartHandler handler(config.getUploadFolder());
-        response = handler.accept(httpRequest);
+        CTianshanHttpResponse http_response = handler.accept(httpRequest);
+        response = http_response.build();
     } else {
-        response = httpResponse.makeResponse(404, "Not Found", "text/plain; charset=utf-8", "Not Found\n");
+        CTianshanHttpResponse http_response(404,"Not Found","TianshanWeb","text/plain; charset=utf-8","Not Found");
+        response = http_response.build();
     }
 
     sendAll(incoming, response);
@@ -70,7 +72,7 @@ void CTianshanHttpController::proceed(int incoming, CTianshanConfig& config) {
     if (this->routes.count(routeKey)) {
         auto handler = this->routes[routeKey];
         CTianshanHttpResponse http_response = handler(httpRequest);
-        response = http_response.getBody();
+        response = http_response.build();
     } else {
         response = httpResponse.makeResponse(404, "Not Found", "text/plain; charset=utf-8", "Not Found\n");
     }
@@ -79,6 +81,6 @@ void CTianshanHttpController::proceed(int incoming, CTianshanConfig& config) {
 }
 
 void CTianshanHttpController::route(const char *method, const char *path, CTianshanConfig &config,
-    std::function<std::string(CTianshanHttpRequest &)> httpHandler) {
+    std::function<CTianshanHttpResponse(CTianshanHttpRequest &)> httpHandler) {
     this->routes.emplace(std::string(method) + "-" + std::string(path), httpHandler);
 }

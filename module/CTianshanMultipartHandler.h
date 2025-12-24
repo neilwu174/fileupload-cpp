@@ -8,6 +8,7 @@
 #include <string>
 
 #include "CTianshanHttpRequest.h"
+#include "CTianshanHttpResponse.h"
 
 
 class CTianshanMultipartHandler {
@@ -24,7 +25,7 @@ private:
 public:
     CTianshanMultipartHandler(std::string uploadFolder) : uploadDir(uploadFolder) {}
     std::string extractParam(const std::string &headerValue, const std::string &param);
-    std::string accept(CTianshanHttpRequest& request);
+    CTianshanHttpResponse accept(CTianshanHttpRequest& request);
     bool saveToFile(const std::string &filename, const std::string &data, std::filesystem::path &outPath);
 };
 

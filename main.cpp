@@ -74,7 +74,7 @@ int main(int argc, const char * argv[]) {
          */
         std::future<void> f = std::async(std::launch::async, [=] {
             CTianshanHttpController controller;
-            controller.route("POST","/upload",*httpConfig,[httpConfig](CTianshanHttpRequest& httpRequest)->std::string {
+            controller.route("POST","/upload",*httpConfig,[httpConfig](CTianshanHttpRequest& httpRequest)->CTianshanHttpResponse {
                 CTianshanMultipartHandler handler = CTianshanMultipartHandler(httpConfig->getUploadFolder());
                 return handler.accept(httpRequest);
             });

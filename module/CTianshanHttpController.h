@@ -50,7 +50,7 @@ private:
 public:
     void accept(int incoming,CTianshanConfig& config);
     void proceed(int incoming,CTianshanConfig& config);
-    void route(const char * method, const char * path,CTianshanConfig& config,std::function<std::string(CTianshanHttpRequest&)> httpHandler);
+    void route(const char * method, const char * path,CTianshanConfig& config,std::function<CTianshanHttpResponse(CTianshanHttpRequest&)> httpHandler);
 };
 
 #endif //FILEUPLOAD_CTIANSHANHTTPCONTROLLER_H
