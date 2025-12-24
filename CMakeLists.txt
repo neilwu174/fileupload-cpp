@@ -34,5 +34,9 @@ add_executable(fileupload main.cpp
         module/tianshan_functions.h
         module/CTianshanHttpResponse.cpp
         module/CTianshanHttpResponse.h
+        module/inja.h
+        module/CTianshanWebHandler.cpp
+        module/CTianshanWebHandler.h
+        module/CTianshanAbstractHandler.h
 )
 target_link_libraries(fileupload PUBLIC yaml-cpp::yaml-cpp nlohmann_json::nlohmann_json) # The library or executable that require yaml-cpp library
