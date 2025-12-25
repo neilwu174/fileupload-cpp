@@ -14,7 +14,7 @@
 #include "module/CTianshanConfig.h"
 #include "module/CTianshanHttpController.h"
 #include "module/CTianshanMultipartHandler.h"
-#include "module/CTianshanHtmlHandler.h"
+#include "module/CTianshanHtmlHomeHandler.h"
 #include "module/inja.h"
 
 namespace fs = std::filesystem;
@@ -81,7 +81,7 @@ int main(int argc, const char * argv[]) {
                 return handler.accept(httpRequest);
             });
             controller.route("GET","/",[httpConfig](CTianshanHttpRequest& httpRequest)->CTianshanHttpResponse {
-                auto handler = CTianshanHtmlHandler(*httpConfig);
+                auto handler = CTianshanHtmlHomeHandler(*httpConfig);
                 return handler.accept(httpRequest);
             });
             controller.proceed(cfd);

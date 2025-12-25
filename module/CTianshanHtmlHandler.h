@@ -10,7 +10,10 @@
 
 class CTianshanHtmlHandler: public CTianshanAbstractHandler {
 protected:
-    std::string get_html_file(inja::Environment& env,inja::json& model,std::string templateFolder,std::string file_name);
+    virtual
+    inja::json get_model() = 0;
+    virtual
+    std::string get_file_name() = 0;
 public:
     CTianshanHtmlHandler(CTianshanConfig &config) : CTianshanAbstractHandler(config) {};
     CTianshanHttpResponse accept(CTianshanHttpRequest& request) override;
