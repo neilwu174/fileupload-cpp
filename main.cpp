@@ -14,6 +14,7 @@
 #include "module/CTianshanConfig.h"
 #include "module/CTianshanHttpController.h"
 #include "module/CTianshanMultipartHandler.h"
+#include "module/CTianshanHtmlHandler.h"
 #include "module/inja.h"
 
 namespace fs = std::filesystem;
@@ -74,16 +75,16 @@ int main(int argc, const char * argv[]) {
          * Handle http request in an asyc mode
          */
         std::future<void> f = std::async(std::launch::async, [=] {
-            CTianshanHttpController controller;
-            controller.route("POST","/upload",*httpConfig,[httpConfig](CTianshanHttpRequest& httpRequest)->CTianshanHttpResponse {
-                CTianshanMultipartHandler handler = CTianshanMultipartHandler(httpConfig->getUploadFolder());
+            CTianshanHttpController controller(*httpConfig);
+            controller.route("POST","/upload",[httpConfig](CTianshanHttpRequest& httpRequest)->CTianshanHttpResponse {
+                auto handler = CTianshanMultipartHandler(*httpConfig);
                 return handler.accept(httpRequest);
             });
-            controller.route("GET","/",*httpConfig,[httpConfig](CTianshanHttpRequest& httpRequest)->CTianshanHttpResponse {
-                CTianshanMultipartHandler handler = CTianshanMultipartHandler(httpConfig->getUploadFolder());
+            controller.route("GET","/",[httpConfig](CTianshanHttpRequest& httpRequest)->CTianshanHttpResponse {
+                auto handler = CTianshanHtmlHandler(*httpConfig);
                 return handler.accept(httpRequest);
             });
-            controller.proceed(cfd,*httpConfig);
+            controller.proceed(cfd);
         });
     }
 

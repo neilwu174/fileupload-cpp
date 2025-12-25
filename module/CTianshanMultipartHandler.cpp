@@ -15,8 +15,9 @@
 
 bool CTianshanMultipartHandler::saveToFile(const std::string &filename, const std::string &data, fs::path &outPath) {
     try {
-        fs::create_directories(uploadDir);
-        outPath = uploadDir / filename;
+        std::filesystem::path uploadFolder = getConfig().getUploadFolder();
+        fs::create_directories(uploadFolder);
+        outPath = uploadFolder / filename;
         std::ofstream ofs(outPath, std::ios::binary);
         if (!ofs) return false;
         ofs.write(data.data(), static_cast<std::streamsize>(data.size()));

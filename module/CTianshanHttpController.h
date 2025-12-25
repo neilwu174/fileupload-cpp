@@ -43,14 +43,15 @@ static std::string readAll(int fd, size_t expected) {
 
 class CTianshanHttpController {
 private:
+    CTianshanConfig& config;
     std::map<std::string,std::function<CTianshanHttpResponse(CTianshanHttpRequest&)>> routes;
     std::function<CTianshanHttpResponse(CTianshanHttpRequest&)> getHandler(const char * method, const char * path) {
         return routes[std::string(method) + "-" + std::string(path)];
     }
 public:
-    void accept(int incoming,CTianshanConfig& config);
-    void proceed(int incoming,CTianshanConfig& config);
-    void route(const char * method, const char * path,CTianshanConfig& config,std::function<CTianshanHttpResponse(CTianshanHttpRequest&)> httpHandler);
+    CTianshanHttpController(CTianshanConfig& config):config(config){};
+    void proceed(int incoming);
+    void route(const char * method, const char * path,std::function<CTianshanHttpResponse(CTianshanHttpRequest&)> httpHandler);
 };
 
 #endif //FILEUPLOAD_CTIANSHANHTTPCONTROLLER_H

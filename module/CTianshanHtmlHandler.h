@@ -7,8 +7,9 @@
 #include "CTianshanAbstractHandler.h"
 
 
-class CTianshanWebHandler: public CTianshanAbstractHandler {
+class CTianshanHtmlHandler: public CTianshanAbstractHandler {
 public:
+    CTianshanHtmlHandler(CTianshanConfig &config) : CTianshanAbstractHandler(config) {};
     CTianshanHttpResponse accept(CTianshanHttpRequest& request) override;
 };
 

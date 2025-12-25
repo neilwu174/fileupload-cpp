@@ -15,7 +15,6 @@
 class CTianshanMultipartHandler : public CTianshanAbstractHandler {
 
 private:
-    std::filesystem::path uploadDir;
     size_t bytesSaved;
 private:
     std::string get_filename();
@@ -24,7 +23,7 @@ private:
     bool acceptInternal(CTianshanHttpRequest& request, std::filesystem::path &savedPath, size_t &bytesSaved);
 
 public:
-    CTianshanMultipartHandler(std::string uploadFolder) : uploadDir(uploadFolder) {}
+    CTianshanMultipartHandler(CTianshanConfig &config) : CTianshanAbstractHandler(config) {};
     std::string extractParam(const std::string &headerValue, const std::string &param);
     bool saveToFile(const std::string &filename, const std::string &data, std::filesystem::path &outPath);
     CTianshanHttpResponse accept(CTianshanHttpRequest& request) override;
