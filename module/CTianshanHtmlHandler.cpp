@@ -6,7 +6,17 @@
 
 #include <iostream>
 
+#include "file_utils.h"
 #include "inja.h"
+
+std::string CTianshanHtmlHandler::get_html_file(inja::Environment& env,inja::json& model,std::string templateFolder, std::string file_name) {
+    std::string full_name = file_name + ".html";
+    fs::path template_path = this->getConfig().getTemplateFolder();
+    fs::path file_path = template_path  / "html" / full_name;
+    std::string html_template = readFileContent(file_path);
+    std::string result = env.render(html_template, model);
+    return result;
+}
 
 CTianshanHttpResponse CTianshanHtmlHandler::accept(CTianshanHttpRequest &request) {
 
@@ -17,27 +27,8 @@ CTianshanHttpResponse CTianshanHtmlHandler::accept(CTianshanHttpRequest &request
     data["title"] = "Welcome to My Website";
     data["user_name"] = "Alice";
     data["items"] = {"Item A", "Item B", "Item C"};
-
-    // 2. Define your HTML template (can also be loaded from a file)
-    std::string html_template = R"(
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>{{ title }}</title>
-    </head>
-    <body>
-        <h1>Hello, {{ user_name }}!</h1>
-        <ul>
-        {% for item in items %}
-            <li>{{ item }}</li>
-        {% endfor %}
-        </ul>
-    </body>
-    </html>
-    )";
-
+    std::string result = get_html_file(env,data,this->getConfig().getTemplateFolder(),"index");
     // 3. Render the template with the data
-    std::string result = env.render(html_template, data);
     CTianshanHttpResponse http_response(200,"OK","TianshanWebAgent","text/html",result);
     // 4. Output the final HTML
     std::cout << result << std::endl;

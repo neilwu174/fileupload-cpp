@@ -23,5 +23,6 @@ void CTianshanConfig::load_config() {
     // HttpConfig yaml = {uploadFolder, db_host, std::to_string(db_port)};
     this->port = db_port;
     this->uploadFolder = uploadFolder;
+    this->templateFolder = config["templatedir"].as<std::string>();
     this->host = db_host;
 }

@@ -15,14 +15,19 @@ struct HttpConfig {
 
 class CTianshanConfig {
 private:
-    std::string uploadFolder;
     std::string host;
     int port;
+    std::string uploadFolder;
+    std::string templateFolder;
 public:
     void load_config();
 
     [[nodiscard]] std::string getUploadFolder() const {
         return uploadFolder;
+    }
+
+    [[nodiscard]] std::string getTemplateFolder() const {
+        return templateFolder;
     }
 
     [[nodiscard]] std::string getHost() const {
