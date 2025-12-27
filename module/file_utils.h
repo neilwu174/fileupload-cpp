@@ -9,7 +9,7 @@
 namespace fs = std::filesystem;
 
 // Function to read the entire content of a file into a string
-std::string readFileContent(const fs::path& filePath) {
+inline std::string readFileContent(const fs::path& filePath) {
     std::ifstream fileStream(filePath);
     if (!fileStream.is_open()) {
         std::cerr << "Error opening file: " << filePath << std::endl;

@@ -19,6 +19,8 @@ private:
     int port;
     std::string uploadFolder;
     std::string templateFolder;
+    std::string publicFolder;
+    std::string publicPrefix;
 public:
     void load_config();
 
@@ -36,6 +38,14 @@ public:
 
     [[nodiscard]] int getPort() const {
         return port;
+    }
+
+    [[nodiscard]] std::string public_folder() const {
+        return publicFolder;
+    }
+
+    [[nodiscard]] std::string public_prefix() const {
+        return publicPrefix;
     }
 };
 

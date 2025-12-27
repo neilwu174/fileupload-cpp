@@ -21,8 +21,10 @@ void CTianshanConfig::load_config() {
     int db_port = config["server"]["port"].as<int>();
     std::cout << "Server Host: " << db_host << ", Port: " << db_port << std::endl;
     // HttpConfig yaml = {uploadFolder, db_host, std::to_string(db_port)};
-    this->port = db_port;
     this->uploadFolder = uploadFolder;
     this->templateFolder = config["templatedir"].as<std::string>();
+    this->publicFolder = config["publicdir"].as<std::string>();
+    this->publicPrefix = config["publicprefix"].as<std::string>();
     this->host = db_host;
+    this->port = db_port;
 }

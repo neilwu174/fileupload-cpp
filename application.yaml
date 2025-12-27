@@ -1,5 +1,7 @@
 upload: /Users/developer/T9/workspace/upload
 templatedir: /Volumes/T9/workspace/cpp-workspace/clion/fileupload-cpp/templates
+publicdir: /Volumes/T9/workspace/cpp-workspace/clion/fileupload-cpp/public
+publicprefix: /static
 server:
   host: 0.0.0.0
   port: 8080

@@ -10,6 +10,7 @@
 
 #include "CTianshanHttpRequest.h"
 #include "CTianshanMultipartHandler.h"
+#include "file_utils.h"
 
 void CTianshanHttpController::proceed(int incoming) {
 
@@ -18,6 +19,20 @@ void CTianshanHttpController::proceed(int incoming) {
 
     if (!httpRequest.accept(incoming)) {
         std::string resp = httpResponse.makeResponse(400, "Bad httpRequestuest", "text/plain; charset=utf-8", "Malformed headers\n");
+        sendAll(incoming, resp);
+        ::close(incoming);
+        return;
+    }
+
+    if (httpRequest.getPath().rfind(this->config.public_prefix(),0) == 0) {
+        //a static page
+        std::string filename = httpRequest.getPath().substr(this->config.public_prefix().size());
+        std::cout << "filename=" << filename << std::endl;
+
+        fs::path path = this->config.public_folder() + filename;
+        std::cout << "path=" << path << std::endl;
+        std::string content = readFileContent(path);
+        std::string resp = httpResponse.makeResponse(200, "Ok", "text/plain; charset=utf-8", content);
         sendAll(incoming, resp);
         ::close(incoming);
         return;

@@ -23,13 +23,19 @@ static volatile std::sig_atomic_t g_shouldStop = 0;
 static int g_listenFd = -1;
 
 void handleSigInt(int) {
+    std::cout << "Caught SIGINT, shutting down...\n";
     g_shouldStop = 1;
     if (g_listenFd >= 0) {
+        /*
+         *When :: is used without a namespace name in front of a method or variable,
+         *it explicitly refers to the global scope or the global namespace. It can be used to access global variables.
+         */
         ::close(g_listenFd);
     }
 }
 
 int main(int argc, const char * argv[]) {
+    //Register Ctrl-C signal handler
     std::signal(SIGINT, handleSigInt);
 
     CTianshanConfig *httpConfig = new CTianshanConfig();
