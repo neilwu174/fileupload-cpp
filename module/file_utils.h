@@ -13,6 +13,8 @@
 #include <regex>
 #include <vector>
 
+#include "models.h"
+
 namespace fs = std::filesystem;
 
 // Function to read the entire content of a file into a string
@@ -91,4 +93,34 @@ inline std::string readFileAsString(const fs::path& filePath) {
     std::vector<std::string> lines = readFileLines(filePath);
     return join(lines, "\n");
 }
+
+inline std::vector<TianshanFile> scan_directory(std::string &path) {
+    std::cout << "scan_directory-started" << std::endl;
+    std::vector<TianshanFile> files;
+    for (const auto& entry : std::filesystem::directory_iterator(path)) {
+        std::cout << "Path:" << entry.path() << std::endl;
+        std::cout << "   Parent:" << entry.path().parent_path() << std::endl;
+        std::cout << "   Name:" << entry.path().filename() << std::endl;
+        TianshanFile file;
+        file.name = entry.path().filename().string();
+        file.path = entry.path().string();
+        file.parent = entry.path().parent_path().string();
+        try {
+            if (!entry.is_directory()) {
+                std::cout << "   Size:" << entry.file_size() << std::endl;
+                file.size = entry.file_size();
+                file.kind = "file";
+                file.image = "file.png";
+            } else {
+                file.kind = "directory";
+                file.image = "folder.png";
+            }
+            files.push_back(file);
+        } catch (const std::exception& e) {
+            std::cerr << "General exception caught: " << e.what() << std::endl;
+        }
+    };
+    return files;
+}
+
 #endif //FILEUPLOAD_FILE_UTILS_H

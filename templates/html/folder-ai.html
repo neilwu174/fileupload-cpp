@@ -1,0 +1,53 @@
+{% include "include/header.html" %}
+
+<div class="container">
+    <!-- Example row of columns -->
+    <table class="table table-sm">
+        <thead>
+        <tr>
+            <th scope="col">Image</th>
+            <th scope="col">Size</th>
+            <th scope="col">Last Updated</th>
+            <th scope="col">Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><img src="/static/images/parent.png" width="25" height="25"><img><a href="/computer/folder?name={{parent}}">{{parent}}</a></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><img src="/static/images/current.png" width="25" height="25"><img>{{current}}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        {% for item in folders -%}
+            <tr>
+                <td><img src="/static/images/folder.png" width="25" height="25"><img>
+                    <a href="/computer/folder?name={{item.path}}">{{item.name}}</a>
+                </td>
+                <td></td>
+                <td></td>
+                <td>
+                </td>
+            </tr>
+        {% endfor -%}
+        {% for item in files -%}
+            <tr>
+                <td><img src="/static/images/file.png" width="25" height="25"><img>
+                    {{item.name}}
+                </td>
+                <td>{{item.size}}</td>
+                <td>{{item.modified_date}}</td>
+                <td>
+                </td>
+            </tr>
+        {% endfor -%}
+        </tbody>
+    </table>
+</div>
+
+{% include "include/footer.html" %}

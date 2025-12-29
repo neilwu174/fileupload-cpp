@@ -23,9 +23,11 @@ private:
     std::string path;
     std::string version;
     std::map<std::string,std::string> headers; // lower-cased keys
+    std::map<std::string,std::string> queryParameters; // lower-cased keys
     std::string body;
     size_t headerEnd;
 private:
+    void parseQueryParameters(const std::string &queryString);
     bool parseRequest(const std::string &raw);
     bool readHeaders(int fd, std::string &raw);
 
@@ -42,6 +44,8 @@ public:
     std::string getPath() { return path; };
     std::string getVersion() { return version; };
     std::map<std::string,std::string> getHeaders() { return headers; };
+    std::map<std::string,std::string> getQueryParameters() { return queryParameters; };
+    std::string getQueryParameter(const std::string &key);
     std::string getBody() { return body; };
     size_t getHeaderEnd() { return headerEnd; };
     void setBody(std::string body) { this->body = body; };

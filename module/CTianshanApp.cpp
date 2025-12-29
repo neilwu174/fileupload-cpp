@@ -7,6 +7,7 @@
 #include <future>
 #include <netinet/in.h>
 
+#include "CTianshanHtmlFolderHandler.h"
 #include "CTianshanHtmlHomeHandler.h"
 #include "CTianshanHtmlNotFoundHandler.h"
 #include "CTianshanHttpController.h"
@@ -80,6 +81,10 @@ int CTianshanApp::run() {
             });
             controller.route("GET","/home",[this](CTianshanHttpRequest& httpRequest)->CTianshanHttpResponse {
                 auto handler = CTianshanHtmlHomeHandler(config);
+                return handler.accept(httpRequest);
+            });
+            controller.route("GET","/computer/folder",[this](CTianshanHttpRequest& httpRequest)->CTianshanHttpResponse {
+                auto handler = CTianshanHtmlFolderHandler(config);
                 return handler.accept(httpRequest);
             });
             controller.route("GET","/not-found",[this](CTianshanHttpRequest& httpRequest)->CTianshanHttpResponse {

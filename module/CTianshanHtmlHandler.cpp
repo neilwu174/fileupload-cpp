@@ -13,7 +13,8 @@ CTianshanHttpResponse CTianshanHtmlHandler::accept(CTianshanHttpRequest &request
 
     inja::Environment env;
     std::string full_name = this->get_file_name() + ".html";
-    inja::json model = this->get_model();
+    std::map<std::string,std::string> parameters = request.getQueryParameters();
+    inja::json model = this->get_model(parameters);
     fs::path template_path = this->getConfig().getTemplateFolder();
     fs::path file_path = template_path  / "html" / full_name;
     std::string html_template = readFileAsString(file_path);

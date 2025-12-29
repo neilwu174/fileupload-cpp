@@ -8,14 +8,34 @@
 #include <iostream>
 #include <curl/curl.h>
 
-void CTianshanFilesystem::scan(std::string &path) {
+#include "models.h"
+
+std::vector<TianshanFile> CTianshanFilesystem::scan(std::string &path) {
+    std::vector<TianshanFile> files;
     try {
         for (const auto& entry : std::filesystem::directory_iterator(path)) {
-            std::cout << entry.path() << std::endl;
+            std::cout << "Path:" << entry.path() << std::endl;
+            std::cout << "   Parent:" << entry.path().parent_path() << std::endl;
+            std::cout << "   Name:" << entry.path().filename() << std::endl;
+            TianshanFile file;
+            file.name = entry.path().filename().string();
+            file.path = entry.path().string();
+            file.parent = entry.path().parent_path().string();
+            if (!entry.is_directory()) {
+                std::cout << "   Size:" << entry.file_size() << std::endl;
+                file.size = entry.file_size();
+                file.kind = "file";
+                file.image = "file.png";
+            } else {
+                file.kind = "directory";
+                file.image = "folder.png";
+            }
+            files.push_back(file);
         }
     } catch (const std::filesystem::filesystem_error& e) {
         std::cerr << "Filesystem error: " << e.what() << std::endl;
     }
+    return files;
 }
 
 static size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {

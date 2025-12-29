@@ -19,15 +19,15 @@
 #include "module/CTianshanHtmlHomeHandler.h"
 #include "module/inja.h"
 
+#include "module/file_utils.h"
 namespace fs = std::filesystem;
 
 void test() {
-    CTianshanFilesystem filesystem;
-    std::string path = "/Users/developer/Downloads";
-    filesystem.scan(path);
+    std::string path = "/";
+    scan_directory(path);
 }
 int main(int argc, const char * argv[]) {
-    test();
+    // test();
     CTianshanConfig *httpConfig = new CTianshanConfig();
     httpConfig->load_config();
     CTianshanApp app(*httpConfig);

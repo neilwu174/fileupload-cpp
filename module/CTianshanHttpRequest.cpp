@@ -75,6 +75,14 @@ bool CTianshanHttpRequest::parseRequest(const std::string &raw) {
         std::istringstream l(line);
         if (!(l >> this->method >> this->path >> this->version)) return false;
     }
+
+    size_t qPos = path.find('?');
+    if (qPos != std::string::npos) {
+        std::string queryString = path.substr(qPos + 1);
+        path = path.substr(0, qPos);
+        parseQueryParameters(queryString);
+    }
+
     std::cout << "parseRequest() loop=" << std::endl;
     while (std::getline(iss, line)) {
         std::cout << "parseRequest(while-loop) line=" << line << std::endl;
@@ -97,6 +105,27 @@ bool CTianshanHttpRequest::parseRequest(const std::string &raw) {
 std::string CTianshanHttpRequest::getHeader(const std::string &key) {
     auto it = this->headers.find(toLower(key));
     if (it != this->headers.end()) return it->second;
+    return {};
+}
+
+void CTianshanHttpRequest::parseQueryParameters(const std::string &queryString) {
+    std::istringstream iss(queryString);
+    std::string pair;
+    while (std::getline(iss, pair, '&')) {
+        size_t pos = pair.find('=');
+        if (pos != std::string::npos) {
+            std::string key = pair.substr(0, pos);
+            std::string value = pair.substr(pos + 1);
+            queryParameters[key] = value;
+        } else if (!pair.empty()) {
+            queryParameters[pair] = "";
+        }
+    }
+}
+
+std::string CTianshanHttpRequest::getQueryParameter(const std::string &key) {
+    auto it = this->queryParameters.find(key);
+    if (it != this->queryParameters.end()) return it->second;
     return {};
 }
 

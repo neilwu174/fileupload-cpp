@@ -12,7 +12,7 @@ protected:
     std::string get_file_name() override {
         return "index";
     };
-    inja::json get_model() override {
+    inja::json get_model(std::map<std::string,std::string>& paremeters) override {
         inja::json data;
         data["title"] = "Welcome to My Website";
         data["user_name"] = "Alice";

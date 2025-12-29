@@ -11,7 +11,7 @@
 class CTianshanHtmlHandler: public CTianshanAbstractHandler {
 protected:
     virtual
-    inja::json get_model() = 0;
+    inja::json get_model(std::map<std::string,std::string>& parameters) = 0;
     virtual
     std::string get_file_name() = 0;
 public:
