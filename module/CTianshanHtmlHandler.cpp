@@ -16,7 +16,8 @@ CTianshanHttpResponse CTianshanHtmlHandler::accept(CTianshanHttpRequest &request
     inja::json model = this->get_model();
     fs::path template_path = this->getConfig().getTemplateFolder();
     fs::path file_path = template_path  / "html" / full_name;
-    std::string html_template = readFileContent(file_path);
+    std::string html_template = readFileAsString(file_path);
+    std::cout << "html_template=" << html_template << std::endl;
     std::string result = env.render(html_template, model);
     CTianshanHttpResponse http_response(200,"OK","TianshanWebAgent","text/html",result);
     return http_response;

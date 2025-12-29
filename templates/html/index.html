@@ -1,15 +1,22 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ title }}</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-<h1>Hello, {{ user_name }}!</h1>
-<ul>
-    {% for item in items %}
-    <li>{{ item }}</li>
-    {% endfor %}
-</ul>
-</body>
-</html>
+{% include "include/header.html" %}
+<div class="container">
+    <!-- Example row of columns -->
+    <div class="row">
+        <div class="col-md-4">
+            <h2>Photoes</h2>
+            <p>Navigate photo collections </p>
+            <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>
+        </div>
+        <div class="col-md-4">
+            <h2>Video</h2>
+            <p>Navigate Video/Movies Collections </p>
+            <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>
+        </div>
+        <div class="col-md-4">
+            <h2>Computer System</h2>
+            <p>Navigate Computers</p>
+            <p><a class="btn btn-secondary" href="/computer/home" role="button">View details &raquo;</a></p>
+        </div>
+    </div>
+</div>
+{% include "include/footer.html" %}

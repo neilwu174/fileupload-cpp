@@ -20,6 +20,9 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(nlohmann)
 
+# Find the CURL package
+find_package(CURL REQUIRED)
+
 add_executable(fileupload main.cpp
         module/CTianshanConfig.cpp
         module/CTianshanConfig.h
@@ -43,5 +46,12 @@ add_executable(fileupload main.cpp
         module/CTianshanHtmlHomeHandler.h
         module/CTianshanApp.cpp
         module/CTianshanApp.h
+        module/CTianshanFilesystem.cpp
+        module/CTianshanFilesystem.h
+        module/CTianshanHtmlNotFoundHandler.cpp
+        module/CTianshanHtmlNotFoundHandler.h
 )
+
 target_link_libraries(fileupload PUBLIC yaml-cpp::yaml-cpp nlohmann_json::nlohmann_json) # The library or executable that require yaml-cpp library
+# Link your executable against the imported libcurl target
+target_link_libraries(fileupload PRIVATE CURL::libcurl)

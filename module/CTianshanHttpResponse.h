@@ -7,10 +7,12 @@
 #include <map>
 #include <string>
 
+const int HTTP_STATUS_OK = 200;
+const int HTTP_STATUS_NOT_FOUND = 404;
 
 class CTianshanHttpResponse {
 private:
-    int status = 200;
+    int status = HTTP_STATUS_OK;
     std::string statusText = "OK";
     std::string date;
     std::string agent;
@@ -34,6 +36,9 @@ public:
     std::string build();
     void setHeader(std::string key,std::string value) {
         this->headers[key] = value;
+    }
+    void setStatus(int status) {
+        this->status = status;
     }
 };
 

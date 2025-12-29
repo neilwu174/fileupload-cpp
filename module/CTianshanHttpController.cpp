@@ -24,6 +24,7 @@ void CTianshanHttpController::proceed(int incoming) {
         return;
     }
 
+    //Handle static css/js/images
     if (httpRequest.getPath().rfind(this->config.public_prefix(),0) == 0) {
         //a static page
         std::string filename = httpRequest.getPath().substr(this->config.public_prefix().size());
@@ -32,7 +33,7 @@ void CTianshanHttpController::proceed(int incoming) {
         fs::path path = this->config.public_folder() + filename;
         std::cout << "path=" << path << std::endl;
         std::string content = readFileContent(path);
-        std::string resp = httpResponse.makeResponse(200, "Ok", "text/plain; charset=utf-8", content);
+        std::string resp = httpResponse.makeResponse(200, "Ok", createContentType(filename), content);
         sendAll(incoming, resp);
         ::close(incoming);
         return;
@@ -46,7 +47,11 @@ void CTianshanHttpController::proceed(int incoming) {
         CTianshanHttpResponse http_response = handler(httpRequest);
         response = http_response.build();
     } else {
-        response = httpResponse.makeResponse(404, "Not Found", "text/plain; charset=utf-8", "Not Found\n");
+        routeKey = "GET-/not-found";
+        auto handler = this->routes[routeKey];
+        CTianshanHttpResponse http_response = handler(httpRequest);
+        response = http_response.build();
+        // response = httpResponse.makeResponse(404, "Not Found", "text/plain; charset=utf-8", "Not Found\n");
     }
     sendAll(incoming, response);
     ::close(incoming);
