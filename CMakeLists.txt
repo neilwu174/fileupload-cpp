@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 4.0)
 project(fileupload)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_OSX_DEPLOYMENT_TARGET "26.0" CACHE STRING "Minimum OS X deployment version")
 
 include(FetchContent)
 
@@ -17,8 +18,15 @@ FetchContent_Declare(
         GIT_REPOSITORY git@github.com:nlohmann/json.git
         GIT_TAG master # Can be a tag (yaml-cpp-x.x.x), a commit hash, or a branch name (master)
 )
-
 FetchContent_MakeAvailable(nlohmann)
+
+FetchContent_Declare(
+        nadjieb_mjpeg_streamer
+        GIT_REPOSITORY git@github.com:nadjieb/cpp-mjpeg-streamer.git
+        GIT_TAG master # Can be a tag (yaml-cpp-x.x.x), a commit hash, or a branch name (master)
+)
+FetchContent_MakeAvailable(nadjieb_mjpeg_streamer)
+
 
 # Find the CURL package
 find_package(CURL REQUIRED)
@@ -57,6 +65,9 @@ add_executable(fileupload main.cpp
         module/CTianshanHtmlFolderHandler.h
 )
 
+target_include_directories(fileupload PRIVATE ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(fileupload PUBLIC yaml-cpp::yaml-cpp nlohmann_json::nlohmann_json) # The library or executable that require yaml-cpp library
 # Link your executable against the imported libcurl target
 target_link_libraries(fileupload PRIVATE CURL::libcurl)
+target_link_libraries(fileupload PRIVATE ${OpenCV_LIBS})
+target_link_libraries(fileupload PRIVATE nadjieb_mjpeg_streamer::nadjieb_mjpeg_streamer)
