@@ -57,6 +57,9 @@ int CTianshanApp::run() {
 
     std::cerr << "HTTP server listening on http://0.0.0.0:" << port << "\n";
 
+    wsServer = new CTianshanWebSocketServer(9002);
+    wsServer->start();
+
     while (!g_shouldStop) {
         sockaddr_in cli{}; socklen_t clilen = sizeof(cli);
         int cfd = ::accept(g_listenFd, reinterpret_cast<sockaddr*>(&cli), &clilen);
@@ -90,6 +93,15 @@ int CTianshanApp::run() {
             controller.route("GET","/not-found",[this](CTianshanHttpRequest& httpRequest)->CTianshanHttpResponse {
                 auto handler = CTianshanHtmlNotFoundHandler(config);
                 return handler.accept(httpRequest);
+            });
+            controller.route("GET","/ws_stream",[this](CTianshanHttpRequest& httpRequest)->CTianshanHttpResponse {
+                inja::Environment env;
+                inja::json model;
+                fs::path template_path = config.getTemplateFolder();
+                fs::path file_path = template_path  / "html" / "ws_stream.html";
+                std::string html_template = readFileAsString(file_path);
+                std::string result = env.render(html_template, model);
+                return CTianshanHttpResponse(200,"OK","TianshanWebAgent","text/html",result);
             });
             controller.proceed(cfd);
         }).detach();

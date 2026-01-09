@@ -9,11 +9,12 @@
 #include <unistd.h>
 
 #include "CTianshanConfig.h"
-#include "CTianshanApp.h"
+#include "CTianshanWebSocketServer.h"
 
 class CTianshanApp {
 private:
     CTianshanConfig &config;
+    CTianshanWebSocketServer* wsServer = nullptr;
     // static volatile std::sig_atomic_t g_shouldStop;
     // static int g_listenFd;
 

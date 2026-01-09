@@ -27,6 +27,29 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(nadjieb_mjpeg_streamer)
 
+FetchContent_Declare(
+        websocket
+        GIT_REPOSITORY https://github.com/zaphoyd/websocketpp.git
+        GIT_TAG master # Can be a tag (yaml-cpp-x.x.x), a commit hash, or a branch name (master)
+)
+FetchContent_MakeAvailable(websocket)
+
+FetchContent_Declare(
+        asio
+        URL https://github.com/chriskohlhoff/asio/archive/refs/tags/asio-1-12-2.tar.gz
+)
+FetchContent_MakeAvailable(asio)
+
+FetchContent_GetProperties(websocket)
+if(NOT websocket_POPULATED)
+    FetchContent_Populate(websocket)
+endif()
+
+FetchContent_GetProperties(asio)
+if(NOT asio_POPULATED)
+    FetchContent_Populate(asio)
+endif()
+
 
 # Find the CURL package
 find_package(CURL REQUIRED)
@@ -63,9 +86,13 @@ add_executable(fileupload main.cpp
         module/models.h
         module/CTianshanHtmlFolderHandler.cpp
         module/CTianshanHtmlFolderHandler.h
+        module/CTianshanWebSocketServer.cpp
+        module/CTianshanWebSocketServer.h
 )
 
-target_include_directories(fileupload PRIVATE ${OpenCV_INCLUDE_DIRS})
+target_compile_definitions(fileupload PRIVATE ASIO_STANDALONE _WEBSOCKETPP_CPP11_STL_)
+
+target_include_directories(fileupload PRIVATE ${OpenCV_INCLUDE_DIRS} ${websocket_SOURCE_DIR} ${asio_SOURCE_DIR}/asio/include)
 target_link_libraries(fileupload PUBLIC yaml-cpp::yaml-cpp nlohmann_json::nlohmann_json) # The library or executable that require yaml-cpp library
 # Link your executable against the imported libcurl target
 target_link_libraries(fileupload PRIVATE CURL::libcurl)
