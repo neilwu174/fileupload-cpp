@@ -12,10 +12,51 @@
 #include <string>
 #include <regex>
 #include <vector>
+#include <algorithm>
 
 #include "models.h"
 
 namespace fs = std::filesystem;
+
+/**
+ * XOR-based encryption/decryption function.
+ * Since XOR is symmetric, the same function can be used for both.
+ */
+inline void xor_cipher(std::vector<char>& data, const std::string& key) {
+    if (key.empty()) return;
+    for (size_t i = 0; i < data.size(); ++i) {
+        data[i] ^= key[i % key.length()];
+    }
+}
+
+/**
+ * Encrypts or decrypts a file using a simple XOR cipher.
+ */
+inline bool cryptFile(const fs::path& sourcePath, const fs::path& destPath, const std::string& key) {
+    std::ifstream inputFile(sourcePath, std::ios::binary);
+    if (!inputFile.is_open()) {
+        std::cerr << "Error opening source file: " << sourcePath << std::endl;
+        return false;
+    }
+
+    // Read file content
+    std::vector<char> buffer((std::istreambuf_iterator<char>(inputFile)), (std::istreambuf_iterator<char>()));
+    inputFile.close();
+
+    // Apply XOR cipher
+    xor_cipher(buffer, key);
+
+    // Write to destination
+    std::ofstream outputFile(destPath, std::ios::binary);
+    if (!outputFile.is_open()) {
+        std::cerr << "Error opening destination file: " << destPath << std::endl;
+        return false;
+    }
+    outputFile.write(buffer.data(), buffer.size());
+    outputFile.close();
+
+    return true;
+}
 
 // Function to read the entire content of a file into a string
 inline std::string readFileContent(const fs::path& filePath) {
@@ -95,19 +136,19 @@ inline std::string readFileAsString(const fs::path& filePath) {
 }
 
 inline std::vector<TianshanFile> scan_directory(std::string &path) {
-    std::cout << "scan_directory-started" << std::endl;
+    // std::cout << "scan_directory-started" << std::endl;
     std::vector<TianshanFile> files;
     for (const auto& entry : std::filesystem::directory_iterator(path)) {
-        std::cout << "Path:" << entry.path() << std::endl;
-        std::cout << "   Parent:" << entry.path().parent_path() << std::endl;
-        std::cout << "   Name:" << entry.path().filename() << std::endl;
+        // std::cout << "Path:" << entry.path() << std::endl;
+        // std::cout << "   Parent:" << entry.path().parent_path() << std::endl;
+        // std::cout << "   Name:" << entry.path().filename() << std::endl;
         TianshanFile file;
         file.name = entry.path().filename().string();
         file.path = entry.path().string();
         file.parent = entry.path().parent_path().string();
         try {
             if (!entry.is_directory()) {
-                std::cout << "   Size:" << entry.file_size() << std::endl;
+                // std::cout << "   Size:" << entry.file_size() << std::endl;
                 file.size = entry.file_size();
                 file.kind = "file";
                 file.image = "file.png";
@@ -121,6 +162,28 @@ inline std::vector<TianshanFile> scan_directory(std::string &path) {
         }
     };
     return files;
+}
+
+inline void encryptRecursively(const std::vector<TianshanFile>& files,const std::string& key) {
+    for (auto file : files) {
+        if (file.kind == "directory") {
+            std::string subpath = file.parent + "/" + file.name;
+            std::vector<TianshanFile> subfiles = scan_directory(subpath);
+            encryptRecursively(subfiles,key);
+        } else {
+            if (file.name.find(".mp4") != std::string::npos ||
+                file.name.find(".avi") != std::string::npos ||
+                file.name.find(".mkv") != std::string::npos) {
+                std::filesystem::path source(file.parent + "/" + file.name);
+                std::filesystem::path dest = file.parent + "/" + file.name + ".enc";
+                std::cout << "encrypt-start ==> source=" << source << std::endl;
+                cryptFile(source, dest, key);
+                std::filesystem::remove(source);
+                std::filesystem::rename(dest, source);
+                std::cout << "encrypt-end ==> source=" << source << ",dest=" << dest << std::endl;
+                }
+        }
+    }
 }
 
 #endif //FILEUPLOAD_FILE_UTILS_H

@@ -23,16 +23,26 @@
 namespace fs = std::filesystem;
 
 void test() {
-    std::string path = "/";
-    scan_directory(path);
+    // std::string sourcePath = "/Users/developer/Downloads/encrypt/video-encrypt.mp4";
+    // std::string destPath = "/Users/developer/Downloads/encrypt/video-1.mp4";
+    // std::string key = "meiyou";
+    // cryptFile(sourcePath, destPath, key);
+
+    std::string path = "/Users/developer/Downloads/encrypt";
+    std::filesystem::path dest = "/Users/developer/Downloads/encrypt-complete";
+    if (!exists(dest)) {
+        std::filesystem::create_directories(dest);
+    }
+    std::vector<TianshanFile> files = scan_directory(path);
+    encryptRecursively(files,"meiyou");
 }
 int main(int argc, const char * argv[]) {
-    // test();
-    CTianshanConfig *httpConfig = new CTianshanConfig();
-    httpConfig->load_config();
-    CTianshanApp app(*httpConfig);
-    app.run();
-    std::cerr << "Shutting down.\n";
-    delete httpConfig;
+    test();
+    // CTianshanConfig *httpConfig = new CTianshanConfig();
+    // httpConfig->load_config();
+    // CTianshanApp app(*httpConfig);
+    // app.run();
+    // std::cerr << "Shutting down.\n";
+    // delete httpConfig;
     return EXIT_SUCCESS;
 }
